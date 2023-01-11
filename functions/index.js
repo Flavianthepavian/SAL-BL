@@ -40,8 +40,8 @@ const scrapeImage = async () => {
 
     function getSingleMarks(string){
         let details = []
-        string = string.replace("Datum Thema Bewertung Gewichtung ", "").replace(" Aktueller Durchschnitt: ", "").replace("\n", " ");
-        string = string.substring(0, string.length - 4);
+        string = string.replace("Datum Thema Bewertung Gewichtung ", "").replace("\n", " ").replace(/\n/g,' ')
+        string = string.substring(0, string.length - 30);
         let tests = [];
         let current = "";
         string.split(" ").forEach(value => {
@@ -50,16 +50,34 @@ const scrapeImage = async () => {
                 if(current !== "")
                 {
                     current = current.substring(0, current.length - 1);
+                    if(current.includes("Details zur Note"))
+                    {
+                        let weight = current.charAt(current.length);
+                        current = current.replace(" Details zur Note Punkte:", "").replace(current.split(" ")[current.split(" ").length - 2] + " " +
+                            current.split(" ")[current.split(" ").length - 1], current.split(" ")[current.split(" ").length - 1]);
+                        current += weight;
+                    }
                     tests.push(current);
                     current = "";
                 }
             }
             current += value + " ";
         });
+        current = current.substring(0, current.length - 1);
+        if(current.includes("Details zur Note"))
+        {
+            let weight = current.charAt(current.length);
+            current = current.replace(" Details zur Note Punkte:", "").replace(current.split(" ")[current.split(" ").length - 2] + " " +
+                current.split(" ")[current.split(" ").length - 1], current.split(" ")[current.split(" ").length - 1]);
+            current += weight;
+        }
+        tests.push(current);
+
+        console.log(tests);
+
 
         tests.forEach(info => {
             let infoNice = {}
-            console.log(info)
             infoNice["datum"] = info.split(" ")[0];
             infoNice["note"] = info.split(" ")[info.split(" ").length - 2]
             infoNice["gewicht"] = info.split(" ")[info.split(" ").length - 1]
@@ -93,7 +111,7 @@ const scrapeImage = async () => {
         }
     });
 
-    console.log(marks);
+    console.log(marks["Mathematik"]["noten"]);
 
     await browser.close();
     console.log("Finished request in " + (Date.now() - start) + " ms");
