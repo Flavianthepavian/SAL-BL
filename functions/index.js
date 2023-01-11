@@ -37,6 +37,39 @@ const scrapeImage = async () => {
 
     let marks = {}
 
+
+    function getSingleMarks(string){
+        let details = []
+        string = string.replace("Datum Thema Bewertung Gewichtung ", "").replace(" Aktueller Durchschnitt: ", "").replace("\n", " ");
+        string = string.substring(0, string.length - 4);
+        let tests = [];
+        let current = "";
+        string.split(" ").forEach(value => {
+            if(value.charAt(2) === value.charAt(5) && value.charAt(2) === ".")
+            {
+                if(current !== "")
+                {
+                    current = current.substring(0, current.length - 1);
+                    tests.push(current);
+                    current = "";
+                }
+            }
+            current += value + " ";
+        });
+
+        tests.forEach(info => {
+            let infoNice = {}
+            console.log(info)
+            infoNice["datum"] = info.split(" ")[0];
+            infoNice["note"] = info.split(" ")[info.split(" ").length - 2]
+            infoNice["gewicht"] = info.split(" ")[info.split(" ").length - 1]
+            infoNice["name"] = info.replace(infoNice.datum + " ", "").replace(" " + infoNice.note + " " + infoNice.gewicht);
+            infoNice["name"] = infoNice.name.replace("undefined", "");
+            details.push(infoNice);
+        })
+        return details;
+    }
+
     function getDetails(string){
         let details = {}
         details["schnitt"] = string.split("\n")[1].split(" ")[string.split("\n")[1].split(" ").length - 1];
@@ -45,11 +78,18 @@ const scrapeImage = async () => {
         return details;
     }
 
+    let active;
+
     values.split("\n\n").forEach(section => {
         if(!section.startsWith("Datum"))
         {
             const details = getDetails(section);
             marks[details["fach"]] = {"schnitt": details["schnitt"], "bestatigt": details["bestatigt"]};
+            active = details["fach"];
+        }
+        else
+        {
+            marks[active]["noten"] = getSingleMarks(section);
         }
     });
 
