@@ -1,8 +1,12 @@
+const express = require('express');
+app = express()
 const puppeteer = require("puppeteer");
-const {convert} = require('html-to-text');
+const {convert} = require("html-to-text");
 
-const scrapeImage = async () => {
-    const start = Date.now();
+const port = process.env.port || 3000;
+
+
+app.get('/', async (req, res) => {
     const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
 
@@ -73,9 +77,6 @@ const scrapeImage = async () => {
         }
         tests.push(current);
 
-        console.log(tests);
-
-
         tests.forEach(info => {
             let infoNice = {}
             infoNice["datum"] = info.split(" ")[0];
@@ -111,11 +112,10 @@ const scrapeImage = async () => {
         }
     });
 
-    console.log(marks["Mathematik"]["noten"]);
-
     await browser.close();
-    console.log("Finished request in " + (Date.now() - start) + " ms");
-}
-scrapeImage();
+    res.send(marks);
+})
 
-
+app.listen(port, () => {
+    console.log("Example app listening on port " + port);
+});
