@@ -13,5 +13,8 @@
     "html-to-text": "^9.0.3",
     "puppeteer": "^19.5.2"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@vercel/node": "^2.8.6"
+  }
 }
