@@ -2,7 +2,7 @@
   "name": "sal",
   "description": "Sal App",
   "scripts": {
-
+    "start": "node index.js"
   },
   "engines": {
     "node": "16"
