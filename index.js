@@ -1,13 +1,13 @@
 const express = require('express');
 app = express()
-const puppeteer = require("chrome-aws-lambda");
+const puppeteer = require("puppeteer");
 const {convert} = require("html-to-text");
 
 const port = process.env.port || 3000;
 
 
 app.get('/', async (req, res) => {
-    const browser = await puppeteer.puppeteer.launch({headless: true});
+    const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
 
     await page.goto("https://sal.portal.bl.ch/sekow/index.php?login");
